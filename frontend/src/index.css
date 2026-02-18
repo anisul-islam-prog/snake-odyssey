@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 220 20% 6%;
+    --foreground: 180 100% 90%;
+
+    --card: 220 25% 10%;
+    --card-foreground: 180 100% 90%;
+
+    --popover: 220 25% 10%;
+    --popover-foreground: 180 100% 90%;
+
+    --primary: 145 80% 42%;
+    --primary-foreground: 220 20% 6%;
+
+    --secondary: 220 30% 18%;
+    --secondary-foreground: 180 100% 90%;
+
+    --muted: 220 25% 14%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 280 80% 55%;
+    --accent-foreground: 180 100% 95%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 30% 18%;
+    --input: 220 30% 15%;
+    --ring: 145 80% 42%;
+
+    --radius: 0.5rem;
+
+    --neon-green: 145 80% 42%;
+    --neon-cyan: 180 100% 50%;
+    --neon-purple: 280 80% 55%;
+    --neon-pink: 330 85% 60%;
+    --neon-orange: 25 95% 55%;
+
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 180 100% 90%;
+    --sidebar-primary: 145 80% 42%;
+    --sidebar-primary-foreground: 220 20% 6%;
+    --sidebar-accent: 220 30% 18%;
+    --sidebar-accent-foreground: 180 100% 90%;
+    --sidebar-border: 220 30% 18%;
+    --sidebar-ring: 145 80% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-glow-green {
+    text-shadow: 0 0 10px hsl(var(--neon-green) / 0.7), 0 0 30px hsl(var(--neon-green) / 0.4);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 10px hsl(var(--neon-cyan) / 0.7), 0 0 30px hsl(var(--neon-cyan) / 0.4);
+  }
+  .text-glow-purple {
+    text-shadow: 0 0 10px hsl(var(--neon-purple) / 0.7), 0 0 30px hsl(var(--neon-purple) / 0.4);
+  }
+  .box-glow-green {
+    box-shadow: 0 0 15px hsl(var(--neon-green) / 0.3), 0 0 40px hsl(var(--neon-green) / 0.1);
+  }
+  .box-glow-purple {
+    box-shadow: 0 0 15px hsl(var(--neon-purple) / 0.3), 0 0 40px hsl(var(--neon-purple) / 0.1);
+  }
+}
