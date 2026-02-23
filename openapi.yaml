@@ -1,0 +1,322 @@
+openapi: 3.0.3
+info:
+  title: Snake Odyssey API
+  description: API specification for the Snake Odyssey multiplayer game.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Invalid credentials
+
+  /auth/signup:
+    post:
+      summary: User registration
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Email already registered or invalid data
+
+  /auth/logout:
+    post:
+      summary: User logout
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Successful logout
+        '401':
+          description: Unauthorized
+
+  /leaderboard:
+    get:
+      summary: Get leaderboard entries
+      operationId: getLeaderboard
+      parameters:
+        - name: mode
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/GameMode'
+        - name: timeFilter
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/TimeFilter'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaderboardEntry'
+
+  /leaderboard/submit:
+    post:
+      summary: Submit a new score
+      operationId: submitScore
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitScoreRequest'
+      responses:
+        '201':
+          description: Score submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardEntry'
+        '401':
+          description: Unauthorized
+
+  /players/live:
+    get:
+      summary: Get current live players
+      operationId: getLivePlayers
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LivePlayer'
+
+  /players/live/{playerId}:
+    get:
+      summary: Get live game state for a specific player
+      operationId: getPlayerGameState
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameState'
+        '404':
+          description: Player not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GameMode:
+      type: string
+      enum:
+        - walls
+        - pass-through
+      description: The game mode played
+
+    TimeFilter:
+      type: string
+      enum:
+        - daily
+        - weekly
+        - all-time
+      description: Filter for leaderboard timespan
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - token
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        token:
+          type: string
+          description: JWT token for authentication
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+        - username
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 6
+        username:
+          type: string
+          minLength: 3
+
+    LeaderboardEntry:
+      type: object
+      required:
+        - id
+        - rank
+        - username
+        - score
+        - mode
+        - date
+        - userId
+      properties:
+        id:
+          type: string
+        rank:
+          type: integer
+        username:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        date:
+          type: string
+          format: date-time
+        userId:
+          type: string
+
+    SubmitScoreRequest:
+      type: object
+      required:
+        - score
+        - mode
+      properties:
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+
+    LivePlayer:
+      type: object
+      required:
+        - id
+        - username
+        - score
+        - mode
+        - startedAt
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        startedAt:
+          type: string
+          format: date-time
+
+    Coordinate:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+
+    GameState:
+      type: object
+      required:
+        - snake
+        - food
+        - direction
+        - score
+        - speed
+        - isGameOver
+        - isPaused
+        - gridSize
+        - mode
+      properties:
+        snake:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coordinate'
+        food:
+          $ref: '#/components/schemas/Coordinate'
+        direction:
+          type: string
+          enum:
+            - UP
+            - DOWN
+            - LEFT
+            - RIGHT
+        score:
+          type: integer
+        speed:
+          type: integer
+        isGameOver:
+          type: boolean
+        isPaused:
+          type: boolean
+        gridSize:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
