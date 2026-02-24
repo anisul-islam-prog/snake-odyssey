@@ -13,10 +13,19 @@ def test_root():
     assert "Welcome" in response.json()["message"]
 
 def test_auth_signup_and_login():
+    # This test now uses the shared helper and does not return a value.
+    token = auth_signup_and_login()
+    assert isinstance(token, str)
+
+
+def auth_signup_and_login():
+    """Helper to create a user and return an access token for reuse in tests.
+    Not a test itself (no `test_` prefix) so pytest won't warn about returning values.
+    """
     unique_user = f"test_{uuid.uuid4().hex[:8]}"
     email = f"{unique_user}@example.com"
     password = "securepassword123"
-    
+
     # Test Signup
     signup_data = {
         "email": email,
@@ -25,22 +34,21 @@ def test_auth_signup_and_login():
     }
     response = client.post("/api/auth/signup", json=signup_data)
     assert response.status_code == 201
-    
+
     user_data = response.json()
     assert user_data["email"] == email
     assert user_data["username"] == unique_user
     assert "token" in user_data
-    
+
     # Test Login
     login_data = {"email": email, "password": password}
     response = client.post("/api/auth/login", json=login_data)
     assert response.status_code == 200
-    
+
     login_resp = response.json()
     assert login_resp["email"] == email
     assert "token" in login_resp
-    
-    # Store token for later tests
+
     return login_resp["token"]
 
 def test_leaderboard():
@@ -55,7 +63,7 @@ def test_submit_score_unauthorized():
 
 def test_submit_score_authorized():
     # First get a token
-    token = test_auth_signup_and_login()
+    token = auth_signup_and_login()
     
     headers = {"Authorization": f"Bearer {token}"}
     score_data = {"score": 999, "mode": "walls"}
